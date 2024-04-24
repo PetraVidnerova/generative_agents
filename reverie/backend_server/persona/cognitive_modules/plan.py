@@ -95,19 +95,24 @@ def generate_hourly_schedule(persona, wake_up_hour):
               "03:00 PM", "04:00 PM", "05:00 PM", "06:00 PM", "07:00 PM",
               "08:00 PM", "09:00 PM", "10:00 PM", "11:00 PM"]
   n_m1_activity = []
-  diversity_repeat_count = 3
-  for i in range(diversity_repeat_count): 
+  diversity_repeat_count = 1 #3
+  for i in range(diversity_repeat_count):
+    print(f"interation {i}")
     n_m1_activity_set = set(n_m1_activity)
     if len(n_m1_activity_set) < 5: 
       n_m1_activity = []
-      for count, curr_hour_str in enumerate(hour_str): 
+      for count, curr_hour_str in enumerate(hour_str):
+        print(f"---------------> {curr_hour_str}")
         if wake_up_hour > 0: 
           n_m1_activity += ["sleeping"]
           wake_up_hour -= 1
         else: 
           n_m1_activity += [run_gpt_prompt_generate_hourly_schedule(
                           persona, curr_hour_str, n_m1_activity, hour_str)[0]]
-  
+        print(f"{curr_hour_str} finished")
+
+  print("WE ARE HERE")
+          
   # Step 1. Compressing the hourly schedule to the following format: 
   # The integer indicates the number of hours. They should add up to 24. 
   # [['sleeping', 6], ['waking up and starting her morning routine', 1], 

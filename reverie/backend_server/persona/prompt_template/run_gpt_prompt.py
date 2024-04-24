@@ -177,6 +177,7 @@ def run_gpt_prompt_generate_hourly_schedule(persona,
       schedule_format += f"[{persona.scratch.get_str_curr_date_str()} -- {i}]"
       schedule_format += f" Activity: [Fill in]\n"
     schedule_format = schedule_format[:-1]
+    schedule_format += "Add only one line." 
 
     intermission_str = f"Here the originally intended hourly breakdown of"
     intermission_str += f" {persona.scratch.get_str_firstname()}'s schedule today: "
@@ -307,7 +308,7 @@ def run_gpt_prompt_task_decomp(persona,
     planning on waking up and doing her morning routine, 
     and from 07:00am ~08:00am, Maeve is planning on having breakfast.  
     """
-      
+  
     curr_f_org_index = persona.scratch.get_f_daily_schedule_hourly_org_index()
     all_indices = []
     # if curr_f_org_index > 0: 
@@ -354,6 +355,9 @@ def run_gpt_prompt_task_decomp(persona,
     prompt_input += [curr_time_range]
     prompt_input += [duration]
     prompt_input += [persona.scratch.get_str_firstname()]
+    print("*******************************************************")
+    print(prompt_input)
+    print("*******************************************************")
     return prompt_input
 
   def __func_clean_up(gpt_response, prompt=""):
@@ -371,7 +375,18 @@ def run_gpt_prompt_task_decomp(persona,
       else: 
         _cr += [i]
     for count, i in enumerate(_cr): 
-      k = [j.strip() for j in i.split("(duration in minutes:")]
+      if ")" not in i:
+        continue
+      if "(duration in minutes:" not in i:
+        if "(duration:" in i:
+          delimiter = "(duration: "
+        else:
+          continue
+      else:
+        delimiter = "(duration in minutes:" 
+        
+      k = [j.strip() for j in i.split(delimiter)]
+      print("K:", k)
       task = k[0]
       if task[-1] == ".": 
         task = task[:-1]
@@ -429,7 +444,7 @@ def run_gpt_prompt_task_decomp(persona,
   gpt_param = {"engine": "text-davinci-003", "max_tokens": 1000, 
              "temperature": 0, "top_p": 1, "stream": False,
              "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
-  prompt_template = "persona/prompt_template/v2/task_decomp_v3.txt"
+  prompt_template = "persona/prompt_template/v2/task_decomp_v4.txt"
   prompt_input = create_prompt_input(persona, task, duration)
   prompt = generate_prompt(prompt_input, prompt_template)
   fail_safe = get_fail_safe()
